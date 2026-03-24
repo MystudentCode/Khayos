@@ -3,7 +3,7 @@
 @if(IsProcessing)
 {
     <div class="position-absolute w-75 h-75 d-flex flex-column align-items-center bg-white justify-content-center">
-        <img src="~/images/loading.gif" alt="loading" />
+        <img src="/images/loading.gif" alt="loading" />
     </div>
 }
 else
@@ -24,10 +24,24 @@ else
                     </button>
                 </div>
             </div>
+            <p>Category's List</p>
         </div>
     </div>
 }
 
 @code {
     public bool IsProcessing { get; set; } = false;
+
+    protected override async Task OnInitializedAsync()
+    {
+        IsProcessing = true;
+        await Task.Delay(1500);
+        LoadCategories();
+        IsProcessing = false;
+    }
+
+    private void LoadCategories()
+    {
+        // Simulate loading categories from a data source
+    }
 }

@@ -1,6 +1,7 @@
 ﻿@page "/product/create"
 @page "/product/insert/{id:int}"
 @inject IProductRepository _productRepository
+@inject ICategoryRepository _categoryRepository
 @inject NavigationManager _navigationManager
 @inject IJSRuntime _JS
 
@@ -16,7 +17,7 @@ else
         <div class="card-header bg-black bg-gradient ml-0 py-3 rounded overflow-hidden">
             <div class="row">
                 <div class="col-12 text-center">
-                    <h2 class="text-white py-2">@(Id>0?"Create":"Update")Product</h2>
+                    <h2 class="text-white py-2">@(Id==0?"Create":"Update")Product</h2>
                 </div>
             </div>
         </div>
@@ -24,25 +25,57 @@ else
           <EditForm Model="Product" FormName="ProductUpsertForm" OnValidSubmit="UpsertProduct">
               <DataAnnotationsValidator />
 
-              <div class="border p-3 mt-4">
-                  <div class="form-floating py-3 col-12">
-                        <InputText id="name" class="form-control" @bind-Value="Product.Name" placeholder="Name" />
+                <div class="border p-3 mt-4">
+
+                    <!-- Name -->
+                    <div class="form-floating py-3 col-12">
+                        <InputText id="name" class="form-control" @bind-Value="Product.Name" placeholder="" />
                         <label for="name">Name</label>
                         <ValidationMessage For="@(() => Product.Name)" />
-                  </div>
-                  <div class="row mt-3">
+                    </div>
+
+                    <!-- Description -->
+                    <div class="form-floating py-3 col-12">
+                        <InputTextArea id="description" class="form-control" @bind-Value="Product.Description" placeholder="" />
+                        <label for="description">Description</label>
+                        <ValidationMessage For="@(() => Product.Description)" />
+                    </div>
+
+                    <div class="form-floating py-3 col-12">
+                        <InputNumber id="price" class="form-control" @bind-Value="Product.Price" placeholder=" " />
+                        <label for="price">Price</label>
+                        <ValidationMessage For="@(() => Product.Price)" />
+                    </div>
+
+                    <div class="form-floating py-3 col-12">
+
+                        @* <lable for="category">Category</lable> *@
+                        <InputSelect id="category" class="form-select" @bind-Value="Product.CategoryId" placeholder="">
+                            <option value="">--Select Category--</option>
+                            @foreach(var category in Category)
+                            {
+                               <option value="@category.Id">@category.Name</option>
+                            }
+                        </InputSelect>
+                        <label for="category">Category</label>
+                        <ValidationMessage For="@(() => Product.CategoryId)" />
+                    </div>
+
+                    <!-- Buttons -->
+                    <div class="row mt-3">
                         <div class="col col-md-3">
                             <button type="submit" class="btn btn-primary form-control" disabled="@IsProcessing">
                                 <i class="bi bi-floppy2-fill"></i> Update
                             </button>
                         </div>
                         <div class="col col-md-3">
-                            <a href="product" type="submit" class="btn btn-secondary form-control" disabled="@IsProcessing">
-                                <i class="bi bi-arrow-bar-left"></i>  to List
+                            <a href="product" class="btn btn-secondary form-control">
+                                <i class="bi bi-arrow-bar-left"></i> to List
                             </a>
                         </div>
-                  </div>
-              </div>
+                    </div>
+
+                </div>
           </EditForm>
         </div>
     </div>
@@ -54,7 +87,7 @@ else
 
     [SupplyParameterFromForm]
     private Product Product { get; set; } = new Product();
-
+    private IEnumerable<Category> Category { get; set; } = new List<Category>();
     private bool IsProcessing { get; set; } = true;
 
     protected override async Task OnAfterRenderAsync(bool firstRender)
@@ -73,6 +106,7 @@ else
         {
             Product = await _productRepository.GetAsync(Id);
         }
+        Category = await _categoryRepository.GetAllAsync();
     }
 
     private async Task UpsertProduct()

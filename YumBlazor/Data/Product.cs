@@ -9,7 +9,7 @@ namespace YumBlazor.Data
         [Required]
         public string Name { get; set; }
         [Range(0.01, 1000)]
-        public string Price { get; set; } 
+        public decimal Price { get; set; }
         public string? Description { get; set; }
         public string? SpecialTag { get; set; }
         public int CategoryId { get; set; }

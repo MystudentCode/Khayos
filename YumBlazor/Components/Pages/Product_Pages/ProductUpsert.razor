@@ -65,6 +65,17 @@ else
                     <div class="form-floating py-3 col-12">
                         <InputFile OnChange="LoadFiles" id="customFile" class="form-control" accept="image/x-png,image/jpeg"></InputFile>"
                         <label for="customFile">Upload Image</label>
+                        @if(Product.ImageUrl!=null)
+                        {
+                            <div class="row pt-3">
+                                <div class="col-3">
+                                    <img src="@Product.ImageUrl" alt="" class="img-thumbnail"/>
+                                </div>
+                                <div class="col-md-9">
+                                    <i class="bi bi-trash btn btn-outline-danger">Remove</i>
+                                </div>
+                            </div>
+                        }
                     </div>
 
                     <!-- Buttons -->
@@ -157,7 +168,7 @@ else
         var path = Path.Combine(_directoryPath, newFileName);
         await using FileStream fileStream = new(path, FileMode.Create);
         await file.OpenReadStream(file.Size).CopyToAsync(fileStream);
-
+        Product.ImageUrl = $"/images/product/{newFileName}";
         IsProcessing = false;
     }
 }

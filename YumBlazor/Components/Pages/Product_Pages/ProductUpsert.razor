@@ -63,7 +63,7 @@ else
                     </div>
 
                     <div class="form-floating py-3 col-12">
-                        <InputFile OnChange="LoadFiles" id="customFile" class="form-control" accept="image/x-png,image/jpeg"></InputFile>"
+                        <InputFile OnChange="LoadFiles" id="customFile" class="form-control" accept="image/x-png,image/jpeg"></InputFile>
                         <label for="customFile">Upload Image</label>
                         @if(Product.ImageUrl!=null)
                         {
@@ -72,7 +72,7 @@ else
                                     <img src="@Product.ImageUrl" alt="" class="img-thumbnail"/>
                                 </div>
                                 <div class="col-md-9">
-                                    <i class="bi bi-trash btn btn-outline-danger">Remove</i>
+                                    <i class="bi bi-trash btn btn-outline-danger" @onclick="DeleteImage">Remove</i>
                                 </div>
                             </div>
                         }
@@ -170,5 +170,23 @@ else
         await file.OpenReadStream(file.Size).CopyToAsync(fileStream);
         Product.ImageUrl = $"/images/product/{newFileName}";
         IsProcessing = false;
+    }
+
+    void DeleteImage()
+    {
+        if(Product.ImageUrl==null)
+        {
+            return;
+        }
+        var fileToDelete = Product.ImageUrl.Split('/').Reverse().First();
+
+        var filePathToDeleteImage = Path.Combine(_directoryPath, fileToDelete);
+        if(!File.Exists(filePathToDeleteImage))
+        {
+            return;
+        }
+        File.Delete(filePathToDeleteImage);
+        Product.ImageUrl = null;
+        return;
     }
 }

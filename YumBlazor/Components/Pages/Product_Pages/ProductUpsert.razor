@@ -17,13 +17,13 @@ else
         <div class="card-header bg-black bg-gradient ml-0 py-3 rounded overflow-hidden">
             <div class="row">
                 <div class="col-12 text-center">
-                    <h2 class="text-white py-2">@(Id==0?"Create":"Update")Product</h2>
+                    <h2 class="text-white py-2">@(Id == 0 ? "Create" : "Update")Product</h2>
                 </div>
             </div>
         </div>
         <div class="card-body p-4">
-          <EditForm Model="Product" FormName="ProductUpsertForm" OnValidSubmit="UpsertProduct">
-              <DataAnnotationsValidator />
+            <EditForm Model="Product" FormName="ProductUpsertForm" OnValidSubmit="UpsertProduct">
+                <DataAnnotationsValidator />
 
                 <div class="border p-3 mt-4">
 
@@ -52,13 +52,18 @@ else
                         @* <lable for="category">Category</lable> *@
                         <InputSelect id="category" class="form-select" @bind-Value="Product.CategoryId" placeholder="">
                             <option value="">--Select Category--</option>
-                            @foreach(var category in Category)
+                            @foreach (var category in Category)
                             {
-                               <option value="@category.Id">@category.Name</option>
+                                <option value="@category.Id">@category.Name</option>
                             }
                         </InputSelect>
                         <label for="category">Category</label>
                         <ValidationMessage For="@(() => Product.CategoryId)" />
+                    </div>
+
+                    <div class="form-floating py-3 col-12">
+                        <InputFile OnChange="LoadFiles" id="customFile" class="form-control" accept="image/x-png,image/jpeg"></InputFile>"
+                        <label for="customFile">Upload Image</label>
                     </div>
 
                     <!-- Buttons -->
@@ -76,7 +81,7 @@ else
                     </div>
 
                 </div>
-          </EditForm>
+            </EditForm>
         </div>
     </div>
 }
@@ -90,6 +95,10 @@ else
     private IEnumerable<Category> Category { get; set; } = new List<Category>();
     private bool IsProcessing { get; set; } = true;
 
+    private string _directoryPath { get; set; }
+    private bool isImageLoading { get; set; } = false;
+
+
     protected override async Task OnAfterRenderAsync(bool firstRender)
     {
         if (firstRender)
@@ -102,7 +111,7 @@ else
 
     private async Task LoadProduct()
     {
-        if(Id>0)
+        if (Id > 0)
         {
             Product = await _productRepository.GetAsync(Id);
         }
@@ -112,7 +121,7 @@ else
     private async Task UpsertProduct()
     {
         IsProcessing = true;
-        if(Product.Id==0)
+        if (Product.Id == 0)
         {
             //create
             await _productRepository.CreateAsync(Product);
@@ -126,5 +135,10 @@ else
         }
         IsProcessing = false;
         _navigationManager.NavigateTo("product");
+    }
+
+    private async Task LoadFiles(InputFileChangeEventArgs e)
+    {
+
     }
 }
